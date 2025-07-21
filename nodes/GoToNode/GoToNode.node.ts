@@ -6,7 +6,7 @@ import {
 	INodeTypeDescription,
 } from 'n8n-workflow';
 import { NodeConnectionType } from 'n8n-workflow';
-import { browserManager } from '../BrowserManager';
+import { getBrowserManager } from '../BrowserManager';
 
 export class GoToNode implements INodeType {
 	description: INodeTypeDescription = {
@@ -16,7 +16,7 @@ export class GoToNode implements INodeType {
 		version: 1,
 		description: 'Basic Example Node',
 		defaults: {
-			name: 'Playwright - Go to Node',
+			name: 'Playwright - Visit url',
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
@@ -34,6 +34,8 @@ export class GoToNode implements INodeType {
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+		const browserManager = await getBrowserManager(this);
+
 		if (!browserManager.isRunning) {
 			throw new ApplicationError('Browser is not running. Please launch the browser first.');
 		}

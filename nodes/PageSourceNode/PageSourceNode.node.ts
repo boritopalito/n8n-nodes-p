@@ -7,15 +7,15 @@ import type {
 import { NodeConnectionType } from 'n8n-workflow';
 import { getBrowserManager } from '../BrowserManager';
 
-export class LaunchNode implements INodeType {
+export class PageSourceNode implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Playwright - Launch Browser',
-		name: 'launchNode',
+		displayName: 'Playwright - Page Source',
+		name: 'pageSourceNode',
 		group: ['transform'],
 		version: 1,
 		description: 'Basic Example Node',
 		defaults: {
-			name: 'Playwright - Launch Browser',
+			name: 'Playwright - Page Source',
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
@@ -25,12 +25,28 @@ export class LaunchNode implements INodeType {
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const browserManager = await getBrowserManager(this);
-		await browserManager.launch();
+		const page = browserManager.getPage();
+
+		await page.waitForLoadState("networkidle");
+
+		const pageSource = await page.content();
+
+		const binaryData = Buffer.from(pageSource);
 
 		return [
 			[
 				{
-					json: { status: "Browser launched!" },
+					json: {
+						pageSource,
+						status: "success"
+					},
+					binary: {
+						data: {
+							data: binaryData.toString('base64'),
+							mimeType: 'text/html',
+							fileName: 'page-source.html',
+						},
+					},
 				},
 			],
 		];

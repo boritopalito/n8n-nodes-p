@@ -1,19 +1,32 @@
 import { Browser, Page, chromium } from 'playwright';
+import { IExecuteFunctions } from 'n8n-workflow';
 
-class BrowserManager {
-	private static instance: BrowserManager;
+export class BrowserManager {
+	private static instances: Map<string, BrowserManager> = new Map();
 	private browser: Browser | null = null;
 	private page: Page | null = null;
 
 	private constructor() {}
 
-	static getInstance(): BrowserManager {
-		if (!BrowserManager.instance) {
-			BrowserManager.instance = new BrowserManager();
+	static getInstance(execution: IExecuteFunctions): BrowserManager {
+		const executionId = execution.getExecutionId();
+		if (!this.instances.has(executionId)) {
+			const instance = new BrowserManager();
+			this.instances.set(executionId, instance);
 		}
-		return BrowserManager.instance;
+		return this.instances.get(executionId)!;
 	}
-	
+
+	public static async cleanup(execution: IExecuteFunctions): Promise<void> {
+		const executionId = execution.getExecutionId();
+		const instance = this.instances.get(executionId);
+
+		if (instance) {
+			await instance.close();
+			this.instances.delete(executionId);
+		}
+	}
+
 	async isRunning(): Promise<boolean> {
 		return this.browser != null;
 	}
@@ -40,4 +53,6 @@ class BrowserManager {
 	}
 }
 
-export const browserManager = BrowserManager.getInstance();
+export async function getBrowserManager(f: IExecuteFunctions): Promise<BrowserManager> {
+	return BrowserManager.getInstance(f);
+}

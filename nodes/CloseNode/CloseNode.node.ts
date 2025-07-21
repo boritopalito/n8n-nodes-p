@@ -5,17 +5,17 @@ import type {
 	INodeTypeDescription,
 } from 'n8n-workflow';
 import { NodeConnectionType } from 'n8n-workflow';
-import { getBrowserManager } from '../BrowserManager';
+import { BrowserManager } from '../BrowserManager';
 
-export class LaunchNode implements INodeType {
+export class CloseNode implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Playwright - Launch Browser',
-		name: 'launchNode',
+		displayName: 'Playwright - Close Browser',
+		name: 'closeNode',
 		group: ['transform'],
 		version: 1,
 		description: 'Basic Example Node',
 		defaults: {
-			name: 'Playwright - Launch Browser',
+			name: 'Playwright - Close Browser',
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
@@ -24,13 +24,12 @@ export class LaunchNode implements INodeType {
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-		const browserManager = await getBrowserManager(this);
-		await browserManager.launch();
+		await BrowserManager.cleanup(this);
 
 		return [
 			[
 				{
-					json: { status: "Browser launched!" },
+					json: { status: "Browser is closed!" },
 				},
 			],
 		];

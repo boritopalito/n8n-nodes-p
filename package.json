@@ -35,7 +35,10 @@
     "credentials": [],
     "nodes": [
       "dist/nodes/LaunchNode/LaunchNode.node.js",
-      "dist/nodes/GoToNode/GoToNode.node.js"
+      "dist/nodes/GoToNode/GoToNode.node.js",
+      "dist/nodes/CloseNode/CloseNode.node.js",
+      "dist/nodes/PageSourceNode/PageSourceNode.node.js",
+      "dist/nodes/GetElementsNode/GetElementsNode.node.js"
     ]
   },
   "devDependencies": {
